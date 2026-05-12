@@ -1,31 +1,33 @@
 import java.awt.Desktop
 import java.net.URI
 import com.sun.net.httpserver.HttpServer
-import com.sun.net.httpserver.HttpHandler
-import com.sun.net.httpserver.HttpExchange
 import java.net.InetSocketAddress
 
 fun main() {
     val serveur = HttpServer.create(InetSocketAddress(8080),0)
 
     val navaccueil = BootstrapNavbar("Accueil", listOf<URI>(URI("http://localhost:8080/About"),URI("http://localhost:8080/Contact")))
-    val footeraccueil = BootstrapFooter("Site par Adrien CAZE des SIO 12")
+    val footer = BootstrapFooter("Site par Adrien CAZE des SIO 12")
+    val cards = BootstrapContainer("Exemple",listOf<BootstrapCard>(BootstrapCard("Carte 1","Ceci est la carte 1"),BootstrapCard("Carte 2","Ceci est la carte 2"),BootstrapCard("Carte 3","Ceci est la carte 3")))
 
-    serveur.createContext("/Accueil"){ exchange ->
+    serveur.createContext("/"){ exchange ->
         val accueil = """
             <!DOCTYPE html>
             <html lang="fr">
                 <head>
                     <meta charset="utf-8">
                     <title>Accueil</title>
+                    ${cssStyles()}
                 </head>
-                <header>
-                    ${navaccueil.render()}
-                </header>
                 <body>
-                    <h1>Hello World !</h1>
+                    ${navaccueil.render()}
+                    <div class="hero">
+                        <h1>Hello World !</h1>
+                        <p>Bienvenue sur mon site créé en Kotlin</p>
+                        ${cards.render()}
+                    </div>
                 </body>
-                ${footeraccueil.render()}
+                ${footer.render()}
             </html>
         """.trimIndent()
         exchange.sendResponseHeaders(200,accueil.toByteArray().size.toLong())
@@ -33,8 +35,8 @@ fun main() {
         os.write(accueil.toByteArray())
         os.close()
     }
-    val navabout = BootstrapNavbar("About", listOf<URI>())
-    val footerabout = BootstrapFooter("Site par Adrien CAZE des SIO 12")
+    val navabout = BootstrapNavbar("About", listOf<URI>(URI("http://localhost:8080/"),URI("http://localhost:8080/Contact")))
+    val aboutCard = BootstrapContainer("A propos", listOf<BootstrapCard>(BootstrapCard("C'est quoi ?","Ce site est une démonstration qui répond a la question : Es-il possible de créé un site web en Kotlin ?")))
     serveur.createContext("/About"){ exchange ->
         val about = """
             <!DOCTYPE html>
@@ -42,12 +44,17 @@ fun main() {
                 <head>
                     <meta charset="utf-8">
                     <title>About</title>
+                    ${cssStyles()}
                 </head>
-                ${navabout.render()}
                 <body>
-                    <h1>Hello World !</h1>
+                    ${navabout.render()}
+                    <div class="hero">
+                            <h1>Hello World !</h1>
+                            <p>Bienvenue sur mon site créé en Kotlin</p>
+                            ${aboutCard.render()}
+                    </div>
                 </body>
-                ${footerabout.render()}
+                ${footer.render()}
             </html>
         """.trimIndent()
         exchange.sendResponseHeaders(200,about.toByteArray().size.toLong())
@@ -55,8 +62,7 @@ fun main() {
         os.write(about.toByteArray())
         os.close()
     }
-
-    val footercontact = BootstrapFooter("Site par Adrien CAZE des SIO 12")
+    val navcontact = BootstrapNavbar("Contact",listOf<URI>(URI("http://localhost:8080/"),URI("http://localhost:8080/About")))
     serveur.createContext("/Contact"){ exchange ->
         val contact = """
             <!DOCTYPE html>
@@ -64,12 +70,16 @@ fun main() {
                 <head>
                     <meta charset="utf-8">
                     <title>Contact</title>
+                    ${cssStyles()}
                 </head>
-                ${nav.render()}
                 <body>
-                    <h1>Hello World !</h1>
+                    ${navcontact.render()}
+                    <div class="hero">
+                        <h1>Hello World !</h1>
+                        <p>Bienvenue sur mon site créé en Kotlin</p>
+                    </div>
                 </body>
-                ${footercontact.render()}
+                ${footer.render()}
             </html>
         """.trimIndent()
         exchange.sendResponseHeaders(200,contact.toByteArray().size.toLong())
@@ -82,6 +92,6 @@ fun main() {
     serveur.start()
     if(Desktop.isDesktopSupported()){
         val desktop = Desktop.getDesktop()
-        desktop.browse(URI("http://localhost:8080/Accueil"))
+        desktop.browse(URI("http://localhost:8080/"))
     }
 }
