@@ -110,12 +110,12 @@ fun main() {
                 <body>
                     ${navcontact.render()}
                     <div class="hero">
-                        <h1>Contactez-moi</h1>
-                        <p>Travaillons ensemble !</p>
+                        <h1>Contact</h1>
+                        <p>Contactez moi !</p>
                     </div>
                     <section class="contact-section">
                         <div class="contact-card">
-                            <form action="https://formspree.io/f/xvgdkbgb" method="POST">
+                            <form action="http://localhost:8080/404" method="POST">
                                 <div class="form-group">
                                     <label for="name">Nom complet</label>
                                     <input id="name" name="name" type="text" placeholder="Jean Dupont" required>
@@ -145,6 +145,38 @@ fun main() {
         os.write(contact.toByteArray())
         os.close()
     }
+
+    val navquatrecent = BootstrapNavbar(
+        "404",
+        listOf(URI("http://localhost:8080/"), URI("http://localhost:8080/About"), URI("http://localhost:8080/Contact"))
+    )
+
+    serveur.createContext("/404") { exchange ->
+        val erreur = """
+            <!DOCTYPE html>
+            <html lang="fr">
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>404</title>
+                    ${cssStyles()}
+                </head>
+                <body>
+                    ${navquatrecent.render()}
+                    <div class="hero">
+                        <h1>Erreur : 404</h1>
+                        <p>Veuillez nous excuser pour cette interuption, nous travaillons actuellement à régler votre problème.</p>
+                    </div>
+                    ${footer.render()}
+                </body>
+            </html>
+        """.trimIndent()
+        exchange.sendResponseHeaders(200, erreur.toByteArray().size.toLong())
+        val os = exchange.responseBody
+        os.write(erreur.toByteArray())
+        os.close()
+    }
+
 
     serveur.start()
     if (Desktop.isDesktopSupported()) {
